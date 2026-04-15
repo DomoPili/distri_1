@@ -25,9 +25,10 @@
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
             
-            // Redirección manejada por JS
+            // Simulando la recepción de un JWT desde un API Gateway
             if(u === 'admin' && p === '123') {
-                localStorage.setItem('isLogged', 'true');
+                const fakeJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulado";
+                localStorage.setItem('jwt_token', fakeJWT);
                 window.location.href = 'buscar.html';
             } else {
                 alert('Credenciales incorrectas');
