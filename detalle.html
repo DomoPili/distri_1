@@ -16,6 +16,10 @@
     <a href="buscar.html" class="back-btn">← Volver al buscador</a>
 
     <script>
+        // FIX: Se agrega protección a la vista de detalles
+        if(!localStorage.getItem('jwt_token')) window.location.href = 'index.html';
+
+        // JS lee el ID de la URL... (el resto de tu código sigue igual)
         // JS lee el ID de la URL
         const id = new URLSearchParams(window.location.search).get('id');
 
