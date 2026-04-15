@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Pokémon</title>
+    <style>
+        body { font-family: sans-serif; background: #f8f9fa; margin: 0; padding: 20px; text-align: center; }
+        .search-bar { margin-bottom: 30px; }
+        input { padding: 12px; width: 250px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 12px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        
+        /* Grid Responsive para las 5 tarjetas */
+        .results-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 20px; max-width: 1000px; margin: 0 auto; 
+        }
+        .card { 
+            background: white; padding: 15px; border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
+        }
+        .card:hover { transform: scale(1.05); border: 1px solid #007bff; }
+        .card img { width: 120px; height: 120px; }
+    </style>
+</head>
+<body>
+    <h1>Explorador PokemonAPI</h1>
+    <div class="search-bar">
+        <input type="text" id="pokeSearch" placeholder="Nombre o ID del Pokémon...">
+        <button onclick="ejecutarBusqueda()">Buscar</button>
+    </div>
+
+    <div id="contenedor" class="results-grid"></div>
+
+    <script>
+        // Seguridad básica: si no está logueado, lo devuelve al login
+        if(localStorage.getItem('isLogged') !== 'true') window.location.href = 'index.html';
+
+        function ejecutarBusqueda() {
+            const query = document.getElementById('pokeSearch').value.toLowerCase();
+            const contenedor = document.getElementById('contenedor');
+            contenedor.innerHTML = "Cargando...";
+
+            fetch('https://pokeapi.co/api/v2/pokemon/' + query)
+                .then(res => res.json())
+                .then(data => {
+                    contenedor.innerHTML = ""; // Limpiar cargando
+                    
+                    // Ciclo para 5 resultados (el buscado + los 4 siguientes)
+                    for(let i = 0; i < 5; i++) {
+                        fetch('https://pokeapi.co/api/v2/pokemon/' + (data.id + i))
+                            .then(r => r.json())
+                            .then(p => {
+                                const cardHTML = `
+                                    <div class="card" onclick="window.location.href='detalle.html?id=${p.id}'">
+                                        <img src="${p.sprites.front_default}">
+                                        <h3>${p.name.toUpperCase()}</h3>
+                                        <p>#${p.id}</p>
+                                    </div>`;
+                                contenedor.innerHTML += cardHTML;
+                            });
+                    }
+                })
+                .catch(() => contenedor.innerHTML = "Pokémon no encontrado.");
+        }
+    </script>
+</body>
+</html>

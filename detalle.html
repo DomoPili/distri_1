@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del tu Pokémon</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; background: #eef2f3; }
+        .info-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+        .back-btn { margin-top: 20px; text-decoration: none; color: #007bff; font-weight: bold; }
+        .badge { background: #007bff; color: white; padding: 5px 12px; border-radius: 15px; font-size: 14px; margin: 5px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div id="detalle-content" class="info-card">Cargando detalles...</div>
+    <a href="buscar.html" class="back-btn">← Volver al buscador</a>
+
+    <script>
+        // JS lee el ID de la URL
+        const id = new URLSearchParams(window.location.search).get('id');
+
+        fetch('https://pokeapi.co/api/v2/pokemon/' + id)
+            .then(res => res.json())
+            .then(p => {
+                document.getElementById('detalle-content').innerHTML = `
+                    <h1 style="margin:0">${p.name.toUpperCase()}</h1>
+                    <p style="color:#777">ID: #${p.id}</p>
+                    <img src="${p.sprites.other['official-artwork'].front_default}" width="250">
+                    <div style="text-align: left; margin-top: 20px;">
+                        <p><strong>Peso:</strong> ${p.weight / 10} kg</p>
+                        <p><strong>Altura:</strong> ${p.height / 10} m</p>
+                        <p><strong>Habilidades:</strong> ${p.abilities.map(a => a.ability.name).join(', ')}</p>
+                        <p><strong>Tipos:</strong></p>
+                        ${p.types.map(t => `<span class="badge">${t.type.name}</span>`).join('')}
+                    </div>
+                `;
+            })
+            .catch(() => document.getElementById('detalle-content').innerHTML = "Error al cargar datos.");
+    </script>
+</body>
+</html>
