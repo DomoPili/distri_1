@@ -16,13 +16,21 @@
     <a href="buscar.html" class="back-btn">← Volver al buscador</a>
 
     <script>
+        // FIX: Se agrega protección a la vista de detalles
+        if(!localStorage.getItem('jwt_token')) window.location.href = 'index.html';
+
         // JS lee el ID de la URL
         const id = new URLSearchParams(window.location.search).get('id');
+        const API_BASE = 'https://pokeapi.co/api/v2/pokemon/';
 
-        fetch('https://pokeapi.co/api/v2/pokemon/' + id)
-            .then(res => res.json())
-            .then(p => {
-                document.getElementById('detalle-content').innerHTML = `
+        async function cargarDetalles() {
+            const contenedor = document.getElementById('detalle-content');
+            try {
+                const res = await fetch(API_BASE + id);
+                if (!res.ok) throw new Error("Error en red");
+                const p = await res.json();
+                
+                contenedor.innerHTML = `
                     <h1 style="margin:0">${p.name.toUpperCase()}</h1>
                     <p style="color:#777">ID: #${p.id}</p>
                     <img src="${p.sprites.other['official-artwork'].front_default}" width="250">
@@ -34,8 +42,12 @@
                         ${p.types.map(t => `<span class="badge">${t.type.name}</span>`).join('')}
                     </div>
                 `;
-            })
-            .catch(() => document.getElementById('detalle-content').innerHTML = "Error al cargar datos.");
+            } catch (error) {
+                contenedor.innerHTML = "Error al cargar datos.";
+            }
+        }
+        
+        cargarDetalles();
     </script>
 </body>
 </html>

@@ -21,16 +21,20 @@
     </div>
 
     <script>
-        document.getElementById('btnLogin').onclick = function() {
+        document.getElementById('btnLogin').onclick = async function() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
             
-            // Redirección manejada por JS
-            if(u === 'admin' && p === '123') {
-                localStorage.setItem('isLogged', 'true');
-                window.location.href = 'buscar.html';
-            } else {
-                alert('Credenciales incorrectas');
+            try {
+                // Estructura lista para cuando conectes tu microservicio real
+                if(u === 'admin' && p === '123') {
+                    localStorage.setItem('jwt_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulado');
+                    window.location.href = 'buscar.html';
+                } else {
+                    throw new Error('Credenciales incorrectas');
+                }
+            } catch (error) {
+                alert(error.message);
             }
         };
     </script>

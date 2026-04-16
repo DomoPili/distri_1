@@ -37,32 +37,35 @@
         // Seguridad básica: si no está logueado, lo devuelve al login
         if(localStorage.getItem('isLogged') !== 'true') window.location.href = 'index.html';
 
-        function ejecutarBusqueda() {
+        const API_BASE = 'https://pokeapi.co/api/v2/pokemon/';
+
+        async function ejecutarBusqueda() {
             const query = document.getElementById('pokeSearch').value.toLowerCase();
             const contenedor = document.getElementById('contenedor');
             contenedor.innerHTML = "Cargando...";
 
-            fetch('https://pokeapi.co/api/v2/pokemon/' + query)
-                .then(res => res.json())
-                .then(data => {
-                    contenedor.innerHTML = ""; // Limpiar cargando
+            try {
+                const res = await fetch(API_BASE + query);
+                if (!res.ok) throw new Error("No encontrado");
+                const data = await res.json();
+                
+                contenedor.innerHTML = ""; 
+                
+                // Refactor: Uso de async/await dentro del ciclo
+                for(let i = 0; i < 5; i++) {
+                    const r = await fetch(API_BASE + (data.id + i));
+                    const p = await r.json();
                     
-                    // Ciclo para 5 resultados (el buscado + los 4 siguientes)
-                    for(let i = 0; i < 5; i++) {
-                        fetch('https://pokeapi.co/api/v2/pokemon/' + (data.id + i))
-                            .then(r => r.json())
-                            .then(p => {
-                                const cardHTML = `
-                                    <div class="card" onclick="window.location.href='detalle.html?id=${p.id}'">
-                                        <img src="${p.sprites.front_default}">
-                                        <h3>${p.name.toUpperCase()}</h3>
-                                        <p>#${p.id}</p>
-                                    </div>`;
-                                contenedor.innerHTML += cardHTML;
-                            });
-                    }
-                })
-                .catch(() => contenedor.innerHTML = "Pokémon no encontrado.");
+                    contenedor.innerHTML += `
+                        <div class="card" onclick="window.location.href='detalle.html?id=${p.id}'">
+                            <img src="${p.sprites.front_default}">
+                            <h3>${p.name.toUpperCase()}</h3>
+                            <p>#${p.id}</p>
+                        </div>`;
+                }
+            } catch (error) {
+                contenedor.innerHTML = "Pokémon no encontrado.";
+            }
         }
     </script>
 </body>
